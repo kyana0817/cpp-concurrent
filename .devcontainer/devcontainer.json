@@ -1,0 +1,30 @@
+{
+    "name": "C++ Concurrency Dev Container",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": ".."
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "files.associations": {
+                    "*.css": "css",
+                    ".eslintrc.cjs": "javascript",
+                    "*.svg": "xml",
+                    "iostream": "cpp"
+                },
+                "cmake.configureOnOpen": true,
+                "cmake.buildDirectory": "${workspaceFolder}/build",
+                "cmake.sourceDirectory": "${workspaceFolder}",
+                "cmake.generator": "Ninja"
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cmake"
+            ]
+        }
+    }
+}
