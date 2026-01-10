@@ -8,6 +8,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+// export module my_tcp;
+
+// namespace my_tcp
+// {
+
+// }
+
 struct TcpSocketHandle
 {
     int fd;

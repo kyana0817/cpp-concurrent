@@ -14,5 +14,5 @@ add_library(shared shared/tcp.cpp)
 add_executable(epoll epoll/epoll.cpp)
 add_executable(unused_epoll epoll/unused.cpp)
 
-target_link_libraries(epoll PRIVATE shared)
-target_link_libraries(unused_epoll PRIVATE shared)
+target_include_directories(epoll PRIVATE shared)
+target_include_directories(unused_epoll PRIVATE shared)

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/epoll.h>
-#include "../shared/tcp.cpp"
+#include "tcp.cpp"
 
 int main()
 {

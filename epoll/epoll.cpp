@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/epoll.h>
-#include "../shared/tcp.cpp"
+#include "tcp.cpp"
 
 #define MAX_EVENTS 1024
 static int nfds = 0;
