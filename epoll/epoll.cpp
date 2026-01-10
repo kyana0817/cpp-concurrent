@@ -29,19 +29,10 @@ int main()
 
     signal(SIGINT, sighandler);
 
-    event.events = EPOLLIN;
-    event.data.fd = STDIN_FILENO;
-    int result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, STDIN_FILENO, &event);
-    if (result == -1)
-    {
-        std::cerr << "Failed to add file descriptor to epoll." << std::endl;
-        close(epoll_fd);
-        return 1;
-    }
-
     {
         TcpSocketHandle socketListener = tcpListen("8080");
         std::cout << "Listening on port 8080 with fd: " << socketListener.fd << std::endl;
+        event.events = EPOLLIN;
         event.data.fd = socketListener.fd;
         int result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, socketListener.fd, &event);
         if (result == -1)
@@ -61,14 +52,7 @@ int main()
 
             for (int i = 0; i < nfds; ++i)
             {
-                if (event_list[i].data.fd == STDIN_FILENO)
-                {
-                    std::cout << "Data available on standard input." << std::endl;
-                    std::string data;
-                    getline(std::cin, data);
-                    std::cout << "Read line from standard input: " << data << std::endl;
-                }
-                else if (event_list[i].data.fd == socketListener.fd)
+                if (event_list[i].data.fd == socketListener.fd)
                 {
                     int client_fd = socketListener.tcpAccept();
                     if (client_fd == -1)
