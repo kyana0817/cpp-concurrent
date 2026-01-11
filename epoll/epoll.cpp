@@ -5,8 +5,8 @@
 #include "tcp.cpp"
 
 #define MAX_EVENTS 1024
-static int nfds = 0;
-static epoll_event event, event_list[MAX_EVENTS];
+int nfds = 0;
+epoll_event event, event_list[MAX_EVENTS];
 
 void sighandler(int signum)
 {
@@ -30,11 +30,13 @@ int main()
     signal(SIGINT, sighandler);
 
     {
-        TcpSocketHandle socketListener = tcpListen("8080");
-        std::cout << "Listening on port 8080 with fd: " << socketListener.fd << std::endl;
+        TcpSocket socket(AF_INET, SOCK_STREAM, 0);
+        socket.bind(8080);
+        socket.listen(SOMAXCONN);
+        std::cout << "Listening on port 8080 with fd: " << socket << std::endl;
         event.events = EPOLLIN;
-        event.data.fd = socketListener.fd;
-        int result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, socketListener.fd, &event);
+        event.data.fd = socket;
+        int result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, socket, &event);
         if (result == -1)
         {
             std::cerr << "Failed to add socket listener to epoll." << std::endl;
@@ -52,9 +54,10 @@ int main()
 
             for (int i = 0; i < nfds; ++i)
             {
-                if (event_list[i].data.fd == socketListener.fd)
+                if (event_list[i].data.fd == socket)
                 {
-                    int client_fd = socketListener.tcpAccept();
+                    std::cout << "New connection event on socket." << std::endl;
+                    int client_fd = socket.accept();
                     if (client_fd == -1)
                     {
                         std::cerr << "Failed to accept connection." << std::endl;
@@ -73,9 +76,12 @@ int main()
                 else
                 {
                     int fd = event_list[i].data.fd;
-                    bool received = socketListener.tcpReceive(fd, buff);
+                    bool received = socket.recv(fd, buff);
                     if (!received)
+                    {
                         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
+                        close(fd);
+                    }
                 }
             }
         }

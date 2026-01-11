@@ -8,12 +8,14 @@ int main()
     int epoll_fd = epoll_create1(0);
 
     {
-        TcpSocketHandle socketListener = tcpListen("8080");
-        std::cout << "Listening on port 8080 with fd: " << socketListener.fd << std::endl;
+        TcpSocket socket(AF_INET, SOCK_STREAM, 0);
+        socket.bind(8080);
+        socket.listen(SOMAXCONN);
+        std::cout << "Listening on port 8080 with fd: " << socket << std::endl;
 
         for (;;)
         {
-            int client_fd = socketListener.tcpAccept();
+            int client_fd = socket.accept();
             if (client_fd == -1)
             {
                 std::cerr << "Failed to accept connection." << std::endl;
@@ -23,7 +25,7 @@ int main()
 
             std::array<char, 1024> buff;
 
-            while (socketListener.tcpReceive(client_fd, buff))
+            while (socket.recv(client_fd, buff))
                 ;
         }
     }
